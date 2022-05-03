@@ -1,0 +1,494 @@
+//Autores del la realizacion del proyecto final de programacion 1.
+//202126766 Karim Garcia Cortes.
+//202127902 Roberto Carlos Hernandez Aparicio.
+//202125466 Camacho Garcia Daniela.
+//202130890 Mendez Leon Arisbeth.
+
+//Programa que registra una base de datos de una cierta cantidad de alumnados del docente, donde despues puede realizar modificaciones a los estudiantes y buscarlos deacuerdo algun criterio.
+
+#include <stdio.h>                                                          //Declaramos la libreria de entrada y salida .
+#include <string.h>                                                         //Declaramos la libreria para poder ocupar funciones en las arreglos.
+#include <ctype.h>                                                          //Aplicamos otra libreria para poder trabajar con caracteres.
+#define MAX 42                                                              //Definimos como MAX con un total de 42 elementos .
+
+struct Tuturados{                                                           //Empezamos a definir nuestro registro con los datos que valos a solicitar en nuestra agenda.
+  char Nombre[20];                                                          //Ponemos como caracter el nombre de la persona. 
+  char NombreP[20];                                                         //Ponemos como caracter el Apellido paterno.
+  char NombreM[20];                                                         //Ponemos como caracter el Apellido materno.
+  char Sexo[2];                                                             //Definimos sexo como caracter(H o M), donde "H" significa Hombre y "M" significa mujer.
+  char Matricula[20];                                                       //Definimos la matricula como un arreglo de caracteres.
+  float Promedio;                                                           //Definimos el promedio como decimar, se ocuparan 2 decimales, por ejemplo: 9.00.
+  int Semestre;                                                             //Declaramos el semestre como entero.
+  int DiaN;                                                                 //Declaramos nuestra fecha de nacimiento en diferentes partes, en dia, mes y nuestro año de nacimiento.
+  int MesN;
+  int AN;
+  int Edad;                                                                 //Declaramos el campo edad como entero.
+  char MunicipioR[50];                                                      //Definimos Municipio de residencia en donde se encuentra la persona como caracter.
+  char CiudadRe[50];                                                        //Definimos Ciudad de residencia en donde se encuentra la persona como caracteres.
+} alumno;
+
+void AbrirArchivo(FILE *archivo){                                           //Aplicamos una funcion para poder abrir el archivo y si no es asi, poderlo crear sin necesidad de hacerlo manualmente.
+    archivo = fopen("Tutorados.bin", "rb");                                 //Ocupamos la funcion "fopen" para poder abrir nuestro archivo TUTORADOS que es un archivo binario que lo abriremos en modo lectura. 
+    if (!archivo){                                                          //Implementamos una condicion donde si el el archivo es distinto a NULL, creara aun archivo
+        archivo =fopen("Tutorados.bin", "wb");                              //Crea archivo "fichero.bin" 
+        printf("\nEl archivo a emplear se ha creado con exito.\n");         //Muestra en pantalla un mensaje donde menciona que el archivo fue creado con exito.
+    }
+    else                                                                    //De lo contrario.
+        printf("El archivo ya ha sido creado con anterioridad.\n");         //Mostrara un mensaje en el monitor donde dira que el archivo ya habia sido creado.
+    fclose(archivo);                                                        //Cerramos el archivo con "fclose", porque si no, nos mostrara error al momento de ejecutar.
+}
+
+void IngresarFunciones(FILE *archivo, struct Tuturados alumno,int altas){   //Definicion de la funcion void IngresarFunciones, donde introduciremos los datos de las personas seleccionadas.
+    archivo = fopen("Tutorados.bin","ab");                                  //Abrimos nuestro archivo binario para poder asi agregar la informacion de los alumnos. 
+    if (archivo==NULL){                                                     //Implementamos una condicion donde si la abertura del archivo arroja NULL
+        printf("\nFichero no existe! \nPor favor creelo");                  //Escribira en pantalla un mensaje de error
+        return;
+    }
+    for (int i=0; i<altas; i++){                                            //Se implimenta un ciclo for, mientras i sea menor que altas, este ciclo funcionara e incrementara su contador.
+        
+        printf("Registro %d\n", i+1);                                       //Aparere el numero de registros que se estan realizando cuando estamos ejecutando el programa.
+        printf("Escribe el nombre del alumno: ");                           //Solicitamos el nombre del alumno a ingresar.
+        fflush(stdin);                                                      //Realizamos la limpieza del bufer de entrada.
+        scanf("%s",alumno.Nombre);                                          //Se lee el nombre y lo guardamos.
+        for(int x=0;alumno.Nombre[x]!='\0';x++){                            //Implementamos un ciclo para, para poder convertir el nombre a mayusculas.
+            if((alumno.Nombre[x]>=97)&&(alumno.Nombre[x]<=122)){            //Asignamos el rango de las palabras.
+                alumno.Nombre[x]=alumno.Nombre[x]-32;}}                     //Se convierten las palabras restandole 32.
+        printf("Ingresa el apellido paterno: ");                            //Solicitamos el apellido paterno del alumno.
+        fflush(stdin);                                                      //Realizamos la limpieza del bufer de entrada.
+        scanf("%s",alumno.NombreP);                                         //Leemos el apellido y lo guardamos.
+        for(int x=0;alumno.NombreP[x]!='\0';x++){                           //Implementamos un para para poder convertir el nombre a mayusculas.
+            if((alumno.NombreP[x]>=97)&&(alumno.NombreP[x]<=122)){          //Asignamos el rango de las palabras.
+                alumno.NombreP[x]=alumno.NombreP[x]-32;}}                   //Se convierten las palabras restandole 32.
+        printf("Escribe el apellido materno: ");                            //Solicitamos el apellido materno.
+        fflush(stdin);                                                      //Realizamos la limpieza del bufer de entrada.
+        scanf("%s",alumno.NombreM);                                         //Leemos el apellido y lo guardamos.
+        for(int x=0;alumno.NombreM[x]!='\0';x++){                           //Implementamos un para para poder convertir el nombre a mayusculas.
+            if((alumno.NombreM[x]>=97)&&(alumno.NombreM[x]<=122)){          //Asignamos el rango de las palabras.
+                alumno.NombreM[x]=alumno.NombreM[x]-32;}}                   //Se convierten las palabras restandole 32.
+        printf("Escribe el sexo (H/M): ");                                  //Solicitamos el sexo del alumno (H o M).
+        fflush(stdin);                                                      //Realizamos la limpieza del bufer de entrada.
+        scanf("%s",alumno.Sexo);                                            //Leemos y guardamos el dato.
+        for(int x=0;alumno.Sexo[x]!='\0';x++){                              //Implementamos un para para poder convertir el nombre a mayusculas.
+            if((alumno.Sexo[x]>=97)&&(alumno.Sexo[x]<=122)){                //Asignamos el rango de las palabras.
+                alumno.Sexo[x]=alumno.Sexo[x]-32;}}                         //Se convierten las palabras restandole 32.
+        printf("Escribe la matricula: ");                                   //Se solicita la matricula del alumno.
+        fflush(stdin);                                                      //Realizamos la limpieza del bufer de entrada.
+        scanf("%s",alumno.Matricula);                                       //Leemos y guardamos el dato.
+        printf("Escribe el promedio: ");                                    //Solicitamos el promesio.
+        fflush(stdin);                                                      //Realizamos la limpieza del bufer de entrada.
+        scanf("%f",&alumno.Promedio);                                       //Leemos y guardamos el dato.
+        printf("Escribe el numero del semestre: ");                         //Solicitamos el semestre.
+        fflush(stdin);                                                      //Realizamos la limpieza del bufer de entrada.
+        scanf("%d",&alumno.Semestre);                                       //Leemos y guardamos el dato.
+        printf("Escribe el dia de nacimiento: ");                           //Pediremos varios datos y los guardaremos en sus respectivas variables.
+        fflush(stdin);                                                      //Realizamos la limpieza del bufer de entrada .         
+        scanf("%d",&alumno.DiaN);
+        printf("Escribe el mes de nacimiento (Ejemplo: 01): ");
+        fflush(stdin);                                                      //Realizamos la limpieza del bufer de entrada.
+        scanf("%d",&alumno.MesN);
+        printf("Escribe el año del nacimiento: ");
+        fflush(stdin);                                                      //Realizamos la limpieza del bufer de entrada.
+        scanf("%d",&alumno.AN);
+        printf("Escribe la edad del alumno: ");
+        fflush(stdin);                                                      //Realizamos la limpieza del bufer de entrada.
+        scanf("%d",&alumno.Edad);
+        printf("Escribe el municipio que rige: ");
+        fflush(stdin);                                                      //Realizamos la limpieza del bufer de entrada.
+        scanf("%s",alumno.MunicipioR);
+        for(int x=0;alumno.MunicipioR[x]!='\0';x++){                        //Implementamos un para para poder convertir el nombre a mayusculas.
+            if((alumno.MunicipioR[x]>=97)&&(alumno.MunicipioR[x]<=122)){    //Asignamos el rango de las palabras.
+                alumno.MunicipioR[x]=alumno.MunicipioR[x]-32;}}             //Se convierten las palabras restandole 32.
+        printf("Escribe la ciudad de residencia: ");                        //Solicitamos la ciudad de residencia.
+        fflush(stdin);                                                      //Realizamos la limpieza del bufer de entrada.
+        scanf("%s",alumno.CiudadRe);                                        //Leemos y guardamos el dato.
+        for(int x=0;alumno.CiudadRe[x]!='\0';x++){                          //Implementamos un para para poder convertir el nombre a mayusculas.
+            if((alumno.CiudadRe[x]>=97)&&(alumno.CiudadRe[x]<=122)){        //Asignamos el rango de las palabras.
+                alumno.CiudadRe[x]=alumno.CiudadRe[x]-32;}}                 //Se convierten las palabras restandole 32.
+        printf("\n");                                                       //Dejamos un espacio entre lineas para que no este amontonada la informacion cuando se repita el ciclo.
+            
+        fwrite(&alumno, sizeof(alumno), 1, archivo);                        //Implementamos "fwrite" donde nos permitira escribir los datos en el archido tomando en cuenta el apuntador. 
+        
+    }
+    fclose(archivo);                                                        //Cerramos el archivo con "fclose".
+}
+
+void Editar(FILE *archivo, struct Tuturados alumno, char matri[]){          //Implementamos una funcion editar con los parametros dentro de ella, para poder cambiar nuestra informacion en caso de un error.
+    archivo = fopen("Tutorados.bin","r+b");                                 //Abrimos nuestro archivo en forma de lectura/escritura para introducir los nuevos datos.
+    if (archivo==NULL){                                                     //Implementamos una condicion, si la abertura del archivo arroja NULL.
+        printf("\nFichero no existe! \nPor favor creelo");                  //Escribe en pantalla mensaje de error.
+        return;
+    }
+    int existencia=0;                                                       //Inicializamos cono existencia igual a 0, la cual nos ayudara mas adelante en el programa.
+    int contador=0;                                                         //Inicializamos un contador. 
+    fread(&alumno, sizeof(alumno), 1, archivo);                             //Lee los datos de la memoria ram para pasar los datos al archivo.
+    while(!feof(archivo)){                                                  //Implementamos un ciclo hasta que archivo sea distinto a "FEOF".
+        if(strcmp(matri,alumno.Matricula) == 0){                            //Se compara la matricula ingresada con la de los alumnos.
+            printf("Registro Anterior");
+            printf("\nNombre del alumno: %s",alumno.Nombre);                //Se muestran todos los datos del alumno de la matricula, los cuales no sera editados.
+            printf("\nApellido P del alumno: %s",alumno.NombreP);
+            printf("\nApellido M del alumno: %s",alumno.NombreM);           //Impresion de los datos del estudiante previemenet registrados.
+            printf("\nSexo del alumno: %s",alumno.Sexo);
+            printf("\nMatricula del alumno: %s",alumno.Matricula);
+            printf("\nPromedio %.2f",alumno.Promedio);
+            printf("\nSemestre: %d",alumno.Semestre);
+            printf("\nDia de nacimiento del alumno: %d",alumno.DiaN);
+            printf("\nMes de nacimiento del alumno: %d",alumno.MesN);
+            printf("\nAN de nacimiento del alumno: %d",alumno.AN);
+            printf("\nEdad del alumno: %d",alumno.Edad);
+            printf("\nNombre del municipio que reside: %s",alumno.MunicipioR);
+            printf("\nNombre de la ciudad en la que reside el alumno: %s",alumno.CiudadRe);
+            printf("\n");                                                   //Dejamos un salto de lineas para que la informacion no este toda junta.
+            
+            
+            printf("\nEscribe el nuevo promedio: ");                        //Solicitamos el nuevo promedio del alumno.
+            fflush(stdin);                                                  //Realizamos la limpieza del bufer de entrada.
+            scanf("%f",&alumno.Promedio);                                   //Se lee el nuevo promedio y se guarda.
+            printf("\nEscribe el nuevo numero del semestre: ");               //Se solicita el nuevo semestre
+            fflush(stdin);                                                  //Realizamos la limpieza del bufer de entrada.
+            scanf("%d",&alumno.Semestre);                                   //Se lee el nuevo  y se guarda.
+            printf("\nEscribe la edad del alumno: ");                       //Solicita la nueva edad del alumno.
+            fflush(stdin);                                                  //Realizamos la limpieza del bufer de entrada.
+            scanf("%d",&alumno.Edad);                                       //Se lee la nueva edad y se guarda.
+            printf("\nEscribe el municipio en el que reside: ");              //Solicita el nuevo municipio.
+            fflush(stdin);                                                  //Realizamos la limpieza del bufer de entrada.
+            scanf("%s",alumno.MunicipioR);                                  //Leemos el nuevo dato y lo guarda.
+            for(int x=0;alumno.MunicipioR[x]!='\0';x++){                    //Implementamos un para para poder convertir el nombre a mayusculas.
+                if((alumno.MunicipioR[x]>=97)&&(alumno.MunicipioR[x]<=122)){//Asignamos el rango de las palabras.
+                    alumno.MunicipioR[x]=alumno.MunicipioR[x]-32;}}         //Se convierten las palabras restandole 32.
+            printf("\nEscribe la ciudad de residencia: ");                  //Solicitamos la nueva ciudad de residencia.
+            fflush(stdin);                                                  //Realizamos la limpieza del bufer de entrada.
+            scanf("%s",alumno.CiudadRe);                                    //Lee la nueva ciudad y la guarda.
+            for(int x=0;alumno.CiudadRe[x]!='\0';x++){                      //Implementamos un para para poder convertir el nombre a mayusculas.
+                if((alumno.CiudadRe[x]>=97)&&(alumno.CiudadRe[x]<=122))     //Asignamos el rango de las palabras
+                    {alumno.CiudadRe[x]=alumno.CiudadRe[x]-32;} }           //Se convierten las palabras restandole 32.
+            printf("\n");                                                   //Implementamos un salto de linea.
+            existencia=1;                                                   //Si se encuentra la matricula, cambia el valor de 'existencia'.
+            break;                                                          //Rompe ciclo porque solo deberia haber un alumno con esa matricula, por lo que no es necesario continuar buscando.  
+        }
+        
+        fread(&alumno, sizeof(alumno), 1, archivo);                         //Lee los datos de la memoria ram para pasar los datos al archivo.
+        contador++;                                                         //Se incrementa el contador, lo cual significa las personas que ha leeido.
+    }
+    fseek(archivo, contador*sizeof(alumno), SEEK_SET);                      //Cuenta el total de baits para posicionar el apuntador en el lugar correspondiente.
+    fwrite(&alumno, sizeof(alumno), 1, archivo);                            //Implementamos "fwrite" donde nos permitira escribir los datos en el archido tomando en cuenta el apuntador. 
+    
+    if(existencia==0)                                                       //Ponemos una condicion, donde si existencia es igual a 0.
+      printf("La matricula ingresada no pertenece a ningun alumno");        //Muestra en pantalla un mensaje mencionando que no se encontro la matricula.
+    fclose(archivo);                                                        //Cerramos el archivo.
+}
+
+void BuscarPromedio(FILE *archivo, struct Tuturados alumno,float promedio){ //Definicion de la funcion void BuscarPromedio.
+    archivo = fopen("Tutorados.bin","rb");                                  //Abrimos el archido en modo lectura.
+    if (archivo==NULL){                                                     //Se implementa otra condicion donde, si la abertura del archivo arroja NULL.
+        printf("\nFichero no existe! \nPor favor creelo");                  //Escribe en pantalla mensaje de error
+        return;
+    }
+    int existencia=0;                                                       //Implementamos una variable en entero.
+    fread(&alumno, sizeof(alumno), 1, archivo);                             //Lee los datos de la memoria ram para pasar los datos al archivo.
+    while(!feof(archivo)){                                                  //Implementamos una condicion, donde si el archivo sea distinto a "FEOF".
+        if(promedio==alumno.Promedio){                                      //Mientras se recorre el arreglo del registro, compara el valor de promedio y el del alumno[i].Promedio
+            printf("\nPromedio %.2f",promedio);                             //Si son iguales se imprimen los datos del arreglo en i
+            printf("\nNombre del alumno: %s",alumno.Nombre);
+            printf("\nApellido P del alumno: %s",alumno.NombreP);
+            printf("\nApellido M del alumno: %s",alumno.NombreM);           //Se muestran en pantalla los datos de alumno.
+            printf("\nSexo del alumno: %s",alumno.Sexo);
+            printf("\nMatricula del alumno: %s",alumno.Matricula);
+            printf("\nSemestre del alumno: %d",alumno.Semestre);            //Se imprimen una serie de datos previamente guardados
+            printf("\nDia de nacimiento del alumno: %d",alumno.DiaN);
+            printf("\nMes de nacimiento del alumno: %d",alumno.MesN);
+            printf("\nAN de nacimiento del alumno: %d",alumno.AN);
+            printf("\nEdad del alumno: %d",alumno.Edad);
+            printf("\nNombre del municipio donde reside: %s",alumno.MunicipioR);
+            printf("\nNombre de la ciudad donde reside el alumno: %s",alumno.CiudadRe);
+            printf("\n");                                                   //Implementamos un salto de lineas para que la informacion no este toda junta.
+            existencia=1;                                                   //Se iguala a 1 "existencia".
+        }
+        fread(&alumno, sizeof(alumno), 1, archivo);                         //Lee los datos de la memoria ram para pasar los datos al archivo.
+    }
+    if(existencia==0)                                                       //Implementmos una condicion donde si "existencia" es igual a 0.
+      printf("No se encontro ningun alumno con ese promedio");              //Mostrara en pantalla un mensaje sonde mencionara que no se encontro ningun alumno con ese promedio.
+    fclose(archivo);                                                        //Cerramos el archivo.
+} 
+
+void BuscarSemestre(FILE *archivo, struct Tuturados alumno,int Semestre){   //Implementamos una funcion de busqueda por medio de semestre donde desntro de ella se encuentran los parametros a utilizar.
+    archivo = fopen("Tutorados.bin","rb");                                  //Abrimos el archivo en modo lectura.
+    if (archivo==NULL){                                                     //Se impmenenta una condicion donde, si la abertura del archivo arroja NULL.
+        printf("\nFichero no existe! \nPor favor creelo");                  //Escribe en pantalla mensaje de error
+        return;
+    }
+    int existencia=0;                                                       //Declaramos nuevamente una variable local en tipo entero.
+    fread(&alumno, sizeof(alumno), 1, archivo);                             //Lee los datos de la memoria ram para pasar los datos al archivo.
+    while(!feof(archivo)){                                                  //Implementamos in ciclo, donde si el archico es distinto a "FEOF", segira su proceso.
+        if(Semestre==alumno.Semestre){                                      //Condicion para que el Semestre sea igual que el semestre del alumno
+            printf("\nSemestre: %d",Semestre);
+            printf("\nNombre del alumno: %s",alumno.Nombre);
+            printf("\nApellido P del alumno: %s",alumno.NombreP);           //Muestra en pantalla los datos del alumno encontrados.
+            printf("\nApellido M del alumno: %s",alumno.NombreM);
+            printf("\nSexo del alumno: %s",alumno.Sexo);
+            printf("\nMatricula del alumno: %s",alumno.Matricula);          //Impresion de los datos del estudiante previemenet registrados.
+            printf("\nPromedio %.2f",alumno.Promedio);
+            printf("\nDia de nacimiento del alumno: %d",alumno.DiaN);
+            printf("\nMes de nacimiento del alumno: %d",alumno.MesN);
+            printf("\nAN de nacimiento del alumno: %d",alumno.AN);
+            printf("\nEdad del alumno: %d",alumno.Edad);
+            printf("\nNombre del municipio donde reside: %s",alumno.MunicipioR);
+            printf("\nNombre de la ciudad donde reside el alumno: %s",alumno.CiudadRe);
+            printf("\n");                                                   //Implementamos un salto de lineas para que la informacion no este toda junta.
+            existencia=1;                                                   //Se iguala a 1 "existencia".
+        }
+        fread(&alumno, sizeof(alumno), 1, archivo);                         //Lee los datos de la memoria ram para pasar los datos al archivo.
+    }
+    if(existencia==0)                                                       //Implementmos una condicion donde si "existencia" es igual a 0.
+      printf("No se encontro ningun alumno en ese semestre");               //Muestra en pantalla un mensaje donde no se pudo encontrar al alumno con ese semestre.
+    fclose(archivo);                                                        //Cerramos el archivo.
+}
+
+void BuscarSexo(FILE *archivo, struct Tuturados alumno, char sx[]){         //Implementamos una funcion de busqueda por medio del sexo del alumno.
+    archivo = fopen("Tutorados.bin","rb");                                  //Se abre el archivo en modo lectura.
+    if (archivo==NULL){                                                     //Se implemnta una condicion donde, si la abertura del archivo arroja NULL
+        printf("\nFichero no existe! \nPor favor creelo");                  //Escribe en pantalla mensaje de error
+        return;
+    }
+    int existencia=0;                                                       //Se declara nuevamente existencia como error.
+    fread(&alumno, sizeof(alumno), 1, archivo);                             //Lee los datos de la memoria ram para pasar los datos al archivo.
+    while(!feof(archivo)){                                                  //Implementamos in ciclo, donde si el archico es distinto a "FEOF", segira su proceso.
+        if(strcmp(sx,alumno.Sexo) == 0){                                    //Compara las dos cadenas para comprobar que sean iguales y asi continuar con el proceso.
+            printf("\nSexo del alumno: %s",sx);
+            printf("\nNombre del alumno: %s",alumno.Nombre);
+            printf("\nApellido P del alumno: %s",alumno.NombreP);           //Muestra los datos del alumno.
+            printf("\nApellido M del alumno: %s",alumno.NombreM);
+            printf("\nMatricula del alumno: %s",alumno.Matricula);
+            printf("\nPromedio %.2f",alumno.Promedio);                      //Impresion de los datos del estudiante previemenet registrados.
+            printf("\nSemestre: %d",alumno.Semestre);
+            printf("\nDia de nacimiento del alumno: %d",alumno.DiaN);
+            printf("\nMes de nacimiento del alumno: %d",alumno.MesN);
+            printf("\nAN de nacimiento del alumno: %d",alumno.AN);
+            printf("\nEdad del alumno: %d",alumno.Edad);
+            printf("\nNombre del municipio donde reside: %s",alumno.MunicipioR);
+            printf("\nNombre de la ciudad donde reside el alumno: %s",alumno.CiudadRe);
+            printf("\n");                                                   //Implementamos un salto de lineas para que la informacion no este toda junta.
+            existencia=1;                                                   //Se iguala a 1 "existencia".
+        }
+        fread(&alumno, sizeof(alumno), 1, archivo);                         //Lee los datos de la memoria ram para pasar los datos al archivo.
+    }
+    if(existencia==0)                                                       //Implementmos una condicion donde si "existencia" es igual a 0.
+      printf("No se encontro ningun alumno que coincida con el sexo");      //Mostrara en pantalla un mensaje donde no coincide el sexo con ninguno de los alumno registrados.
+    fclose(archivo);                                                        //Cerramos el archivo.
+}
+
+void BuscarEdad(FILE *archivo, struct Tuturados alumno, int edad){          //Definicion de la funcion void para implementar la busqueda por edad.
+    archivo = fopen("Tutorados.bin","rb");                                  //Abrimos el archivo en modo lectura.
+    if (archivo==NULL){                                                     //Si la abertura del archivo arroja NULL.
+        printf("\nFichero no existe! \nPor favor creelo");                  //Escribe en pantalla mensaje de error.
+        return;
+    }
+    int existencia=0;                                                       //Se declara "existencia" igual a 0.
+    fread(&alumno, sizeof(alumno), 1, archivo);                             //Lee los datos de la memoria ram para pasar los datos al archivo.
+    while(!feof(archivo)){                                                  //Implementamos un ciclo, mientras archivo sea distinto de "FEOF".
+            if(edad==alumno.Edad){                                          //Se compara la edad con la ingesada en la edad de los alumnos para verificar que sean iguales.
+            printf("\nEdad del alumno: %d",edad);
+            printf("\nNombre del alumno: %s",alumno.Nombre);
+            printf("\nApellido P del alumno: %s",alumno.NombreP);
+            printf("\nApellido M del alumno: %s",alumno.NombreM);           //Muestra los datos del alumno encontrado,
+            printf("\nSexo del alumno: %s",alumno.Sexo);
+            printf("\nMatricula del alumno: %s",alumno.Matricula);
+            printf("\nPromedio %.2f",alumno.Promedio);                      //Impresion de los datos del estudiante previemenet registrados.
+            printf("\nSemestre: %d",alumno.Semestre);
+            printf("\nDia de nacimiento del alumno: %d",alumno.DiaN);
+            printf("\nMes de nacimiento del alumno: %d",alumno.MesN);
+            printf("\nAN de nacimiento del alumno: %d",alumno.AN);
+            printf("\nNombre del municipio donde reside: %s",alumno.MunicipioR);
+            printf("\nNombre de la ciudad donde reside el alumno: %s",alumno.CiudadRe);
+            printf("\n");                                                   //Implementamos un salto de lineas para que la informacion no este toda junta.
+            existencia=1;                                                   //Igualamos "existencia" igual a 1.
+        }
+        fread(&alumno, sizeof(alumno), 1, archivo);                         //Lee los datos de la memoria ram para pasar los datos al archivo.
+    }
+    if(existencia==0)                                                       //Implementamos una condicion.
+      printf("No se encontro ningun alumno con esa edad");                  //Muestra en pantalla un mensaje donde no se encontro ningun alumno con la edad solicitada.
+    fclose(archivo);                                                        //Cerramos el archivo.
+}
+
+
+void BuscarCiudad(FILE *archivo, struct Tuturados alumno, char lugar[]){    //Definicion de la funcion void con el nombre de BuscarCuidad.
+    archivo = fopen("Tutorados.bin","rb");                                  //Abrimos el archivo en modo lectura.
+    if (archivo==NULL){                                                     //Si la abertura del archivo es igual a NULL.
+        printf("\nFichero no existe! \nPor favor creelo");                  //Escribe en pantalla mensaje de error.
+        return; 
+    }
+    int existencia=0;                                                       //Declaramos una variable en forma de entero.
+    fread(&alumno, sizeof(alumno), 1, archivo);                             //Lee los datos de la memoria ram para pasar los datos al archivo.
+    while(!feof(archivo)){                                                  //Se implementa un ciclo, mientras archivo sea distinto a "FEOF", continuara con el proceso.
+        if(strcmp(lugar,alumno.CiudadRe) == 0){                             //Se busca si el lugar es igual a la ciudad del estudiante.
+            printf("\nCuidad del alumno: %s",lugar);
+            printf("\nNombre del alumno: %s",alumno.Nombre);
+            printf("\nApellido P del alumno: %s",alumno.NombreP);           //Muestra los datos del estudiante encontrado.
+            printf("\nApellido M del alumno: %s",alumno.NombreM);
+            printf("\nSexo del alumno: %s",alumno.Sexo);                    //Impresion de los datos del estudiante previemenet registrados.
+            printf("\nMatricula del alumno: %s",alumno.Matricula);
+            printf("\nPromedio %.2f",alumno.Promedio);
+            printf("\nSemestre: %d",alumno.Semestre);
+            printf("\nDia de nacimiento del alumno: %d",alumno.DiaN);
+            printf("\nMes de nacimiento del alumno: %d",alumno.MesN);
+            printf("\nAN de nacimiento del alumno: %d",alumno.AN);
+            printf("\nEdad del alumno: %d",alumno.Edad);
+            printf("\nNombre del municipio donde reside: %s",alumno.MunicipioR);
+            printf("\n");                                                   //Implementamos un salto de lineas para que la informacion no este toda junta.
+            existencia=1;                                                   //Igualamos a 1 "existencia".
+        }
+        fread(&alumno, sizeof(alumno), 1, archivo);                         //Lee los datos de la memoria ram para pasar los datos al archivo.
+    }
+    if(existencia==0)                                                       //Implementamos una condicion.
+      printf("No se encontro ningun alumno que habite esa ciudad");         //Muestra en pantalla un mensaje donde no se puedo encontrar la cuidad solicitada.
+    fclose(archivo);                                                        //Cerramos el archivo.
+}
+
+void MostrarTodos(FILE *archivo, struct Tuturados alumno){                  //Definimos un funcion para mostrar lo datos antes ingresados.
+    archivo=fopen("Tutorados.bin","rb");                                    //Abrimos el archivo en modo lectura.
+    if (archivo==NULL){                                                     //Si la apertura del archivo es igual a NULL.
+        printf("\nFichero no existe! \nPor favor creelo");                  //Escribe en pantalla mensaje de error
+        return;
+    }
+    fread(&alumno, sizeof(alumno), 1, archivo);                             //Lee los datos de la memoria ram para pasar los datos al archivo.
+    while(!feof(archivo))                                                   //Aplicamos un ciclo hasta que el archivo no termine, seguira el proceso.
+    {
+        printf("\nNombre del alumno: %s",alumno.Nombre);
+        printf("\nApellido P del alumno: %s",alumno.NombreP);
+        printf("\nApellido M del alumno: %s",alumno.NombreM);               //Impresion de los datos del estudiante previamente registrados
+        printf("\nSexo del alumno: %s",alumno.Sexo);
+        printf("\nMatricula del alumno: %s",alumno.Matricula);
+        printf("\nPromedio %.2f",alumno.Promedio);
+        printf("\nSemestre: %d",alumno.Semestre);
+        printf("\nDia de nacimiento del alumno: %d",alumno.DiaN);
+        printf("\nMes de nacimiento del alumno: %d",alumno.MesN);
+        printf("\nAN de nacimiento del alumno: %d",alumno.AN);              //Se muestran los datos ingresados ya editados o modificados.
+        printf("\nEdad del alumno: %d",alumno.Edad);
+        printf("\nNombre del municipio que reside: %s",alumno.MunicipioR);
+        printf("\nNombre de la ciudad en la que reside el alumno: %s",alumno.CiudadRe);
+        printf("\n");                                                       //Ingresamos un salto de linea para que la informacion ingresado no esta junta.
+        fread(&alumno, sizeof(alumno), 1, archivo);                         //Lee los datos de la memoria ram para pasar los datos al archivo.
+    }
+    fclose(archivo);                                                        //Cerramos el archivo para que no tenga ningun error.
+}
+
+int main()                                                                  //Iniciamos el programa a ejecutar
+{
+    FILE *archivo;                                                          //Se declara el nombre del archivo con un puntero
+    int x, option, num, Semestre, edad;                                     //Declaramos variables globales enteras
+    float promedio;                                                         //Declaramos las variables globales decimales
+    char sx[2], lugar[30], mat[20];                                         //Declaramos los arreglos
+    
+    AbrirArchivo(archivo);                                                  //Abre el archivo a manipular tan pronto comienza a ejecutarse el programa,informando sobre su estado
+    
+    do{                                                                     //Insertamos el repetidor, lo cual nos permitira repetir el proceso cuantas veses desee la persona.
+    printf("--------M E N U------\n");                                      //Mostramos en pantalla el menu del programa
+    printf("\t1.-Capturar\n");                                              //Definimos los elementos del menu que se mostraran en pantalla.
+    printf("\t2.-Editar\n");                                                //Mostramos en pantalla las 5 opciones (Capturar, Editar, Buscar, Listar, Salir)
+    printf("\t3.-Buscar\n");
+    printf("\t4.-Listar todos los alumnos registrados\n");
+    printf("\t5.-Salir\n");
+    printf("Digite la opcion a realizar: ");                                //Pedimos al usuario que digite su opcion a realizar.
+    scanf("%d", &x);                                                        //Ingresemas desde teclado la opcion que desea la persona.
+    while ((x!=1)&&(x!=2)&&(x!=3)&&(x!=4)(x!=5)){                           //Se aplica un cilo donde se valida la opcion que se ingreso anteriormente.
+        printf("\nEscribe un numero que corresponda al menu");              //Vuelve a parecer en pantalla una advertencia porque no ingreso una opcion del menu.
+        printf("\n¿Que opcion desea realizar?");                            //Aparece en patalla  nuevamente pidiendo una opcion a realizar.
+        scanf("%d", &x);                                                    //Insertamos desde teclado la opcion a realizar nuevamente. Lo cual se repetira el ciclo hasta que ingrese correctamente la opcion.
+    }
+    switch(x){                                                              //Implementamos un switch para ejecutar las opcines del menu.
+        case 1:                                                             //Inicia el primer caso, donde se ejecuta la opcion de capturar los datos.
+            printf("\nCaptura");                                            //Aparece en pantalla un mensaje de capturar
+            printf("\nIngrese el numero de alumnos a dar de alta: ");       //Se solicita que ingrese la cantidad de alumnos a ingresar.
+            scanf("%d", &num);                                              //Obtiene la cantidad a leer desde el teclado.
+            fflush(stdin);                                                  //Realizamos la limpieza del bufer de entrada.
+            IngresarFunciones(archivo,alumno,num);                          //Llama a la funcion IngresarFunciones donde se ingresaran los datos.
+            printf("\n");                                                   //Dejas un espacio entre lineas para que no este amontonado.
+            break;                                                          //Rompemos el primer caso y se finaliza.
+    
+        case 2:                                                             //Iniciamos el segundo caso donde se ejecuta la opcion de editar.
+            printf("\nEditar");                                             //Aparece en pantalla un mensaje de editar
+            printf("\nIngrese la matricula del alumno que desea editar: "); //Se solicita la matricula del alumno del cual se editaran sus datos anteriormente ingresados.
+            fflush(stdin);                                                  //Realizamos la limpieza del bufer de entrada
+            scanf("%s", mat);                                               //Leemos la matricula ingresada.
+            Editar(archivo, alumno, mat);                                   //Llamada a la funcion editar donde se realizara el proceso de editar.
+            printf("\n");                                                   //Implementamos un salto de lineas para que la informacion no este amontonada.
+            break;                                                          //Se rompe el segundo caso y se finaliza.
+            
+        case 3:                                                             //Iniciamos el tercer caso donde se implementara la opcion de editar.
+            do{                                                             //Implementamos otro repetido para implementar un menu secundario.
+             printf("\n-MENU DE BUSQUEDA-\n");                              //Insertamos un memu dentro del caso 3
+             printf("\t1.-Promedio\n");                                     //Aparecera en pantalla las opciones que brinda el menu
+             printf("\t2.-Semestre\n");                                     //Mostrara los 6 metodos de busqueda en pantalla (Promedio, Semestre, Sexo, Edad, Ciudad)
+             printf("\t3.-Sexo\n");
+             printf("\t4.-Edad\n");
+             printf("\t5.-Ciudad\n");
+             printf("\t6.-Salir\n");
+             printf("Digite la opcion a realizar: ");                       //Mostrara un mensaje pidiendo al usuario insertar la opcion que desea realizar.
+             scanf("%d", &option);                                          //Se inserta desde teclado la opcion.
+             while ((option!=1)&&(option!=2)&&(option!=3)&&(option!=4)&&(option!=5)&&(option!=6)){  //Validacion de la lectura de opcion que se ingreso anteriormente.
+                printf("\nEscribe un numero que corresponda al menu");      //Vuelve a parecer en patalla una abvertencia
+                printf("\n¿Que opcion desea realizar?");                    //Aparece en patalla  nuevamente pidiendo una opcion a realizar
+                scanf("%d", &option);                                       //Insertamos desde teclado la opcion y el ciclo se repetira hasta ingresar la opcion correcta.
+            }
+             switch(option){                                                //Implementamos nuevamente un switch.
+                case 1:                                                     //Iniciamos el primer caso donde se ejecutara la opcion de promedio.
+                    printf("\nIngrese el promedio a buscar: ");             //Se solicita el promedio del alumno.
+                    scanf("%f",&promedio);                                  //Leemos el dato que se ingreso.
+                    fflush(stdin);                                          //Realizamos la limpieza del bufer de entrada.
+                    BuscarPromedio(archivo, alumno, promedio);              //Llamada a la funcion BuscarPromedio donde se ejecutara todo el proceso.
+                    printf("\n");                                           //Se ejecuta un salto de linea.
+                    break;                                                  //Rompemos el primer caso.
+                    
+                case 2:                                                     //Iniciamos el segundo caso donde se ejecuta la edicion por semestre.
+                    printf("\nIngrese el semestre a buscar: ");             //Solicitamos el semestre a buscar del alumno.
+                    scanf("%d",&Semestre);                                  //Leemos el dato ingresado.
+                    fflush(stdin);                                          //Realizamos la limpieza del bufer de entrada.
+                    BuscarSemestre(archivo, alumno, Semestre);              //Lamamos a la funcion BuscarSemestre.
+                    printf("\n");                                           //Realizamos un salto de linea.
+                    break;                                                  //Rompemos el segundo caso.
+                    
+                case 3:                                                     //Iniciamos el tercer caso de la busqueda por el sexo.
+                    printf("\nIngrese el sexo a buscar (Ejemplo: H/M): ");  //Solicitamos el sexo a buscar del alumno.
+                    scanf("%s",sx);                                         //Leemos el dato que se ingreso.
+                    for(int x=0;sx[x]!='\0';x++){                           //Implementamos un para para poder combertir la letra a mayusculas.
+                    if((sx[x]>=97)&&(sx[x]<=122)){                          //Asignamos el rango de las palabras.
+                            sx[x]=sx[x]-32;}}                               //Se convierten las palabras restandole 32.
+                    fflush(stdin);                                          //Realizamos la limpieza del bufer de entrada.
+                    BuscarSexo(archivo, alumno, sx);                        //Se llamada a la funcion BuscarSexo.
+                    printf("\n");                                           //Ejecutamos un salto de linea.
+                    break;                                                  //Rompemos el tercer caso.
+                
+                case 4:                                                     //Iniciamos el cuarto caso donde se ejecuta la busqueda por edad.
+                    printf("\nIngrese la edad a buscar: ");                 //Solicitamos la edad a buscar del alumno.
+                    scanf("%d",&edad);                                      //Leemos la edad introducida.
+                    fflush(stdin);                                          //Realizamos la limpieza del bufer de entrada.
+                    BuscarEdad(archivo, alumno, edad);                      //Llamada al a funcion BuscarEdad donde se ejecuta el proceso.
+                    printf("\n");                                           //Implementamos un salto de linea.
+                    break;                                                  //Rompemos el cuarto caso.
+                
+                case 5:                                                     //Iniciamos el quinto y ultimo caso donde se implementa la busqueda por ciudad.
+                    printf("\nIngrese la ciudad a buscar: ");               //Solicitamos la edad del alumno.
+                    scanf("%s",lugar);                                      //Leemos la edad del alumno.
+                    for(int x=0;lugar[x]!='\0';x++){                        //Implementamos un para para poder combertir el nombre a mayusculas.
+                        if((lugar[x]>=97)&&(lugar[x]<=122)){                //Asignamos el rango de las palabras.
+                            lugar[x]=lugar[x]-32;}}                         //Se convierten las palabras restandole 32.
+                    fflush(stdin);                                          //Realizamos la limpieza del bufer de entrada.
+                    BuscarCiudad(archivo, alumno, lugar);                   //Llamada a la funcion BuscarCiudad.
+                    printf("\n");                                           //Se implementa un salto de linea.
+                    break;                                                  //Rompemos el quinto y ultimo caso del menu secundario.
+             }
+            }while(option!=6);                                              //Se pone una cindicion al repetido, para que se puede repetir las veses que sea. 
+            printf("\n Continuemos :) \n\n");                               //Mensaje de despedida si la persona desea salir del menu secundario y regresar al primario.
+            break;                                                          //Terminamos el ciclo de la opcion de buscar.
+        
+        case 4:                                                             //Se implementa el cuarto y ultimo caso, donde se muestran los alumnos ingresados.
+            printf("Todos los alumnos registrados son:");                   //Muestra en pantalla un mensaje.
+            MostrarTodos(archivo, alumno);                                  //Se muestran todos los alumnos que se ingresaron desde el teclaco.
+            break;                                                          //Se rompe el ultimo caso.
+            
+    }
+    }while(x!=5);                                                           //Imponemos una condicion al repeditor goblal para poder repetirse las veses que sea el programa.         
+    printf ("\nBYE\n");                                                     //Mensaje de despedida del programa
+    printf ("\nBonito dia\n");
+    return 0;                                                               //Verifica  que el programa se realizo con exito
+}                                                                           //Fin del programa
+
